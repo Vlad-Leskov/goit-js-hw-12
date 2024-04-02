@@ -7,15 +7,52 @@ const form = document.querySelector('#search-form');
 const input = document.querySelector('#search-input');
 const loader = document.getElementById('loader');
 const gallery = document.querySelector('.gallery');
+const btnLoadMore = document.querySelector('.load-more-btn');
 
-form.addEventListener('submit', event => {
-  event.preventDefault();
-  loader.style.display = 'block';
+let searchQuery;
+let currentPage = 1;
+let maxPage = 0;
+const per_page = 15;
+
+function showLoadMore() {
+  btnLoadMore.classList.remove('hidden');
+}
+function hideLoadMore() {
+  btnLoadMore.classList.add('hidden');
+}
+
+function showLoader() {
+  loader.classList.remove('hidden');
+}
+function hideLoader() {
+  loader.classList.add('hidden');
+}
+
+function checkBtnStatus() {
+  if (currentPage >= maxPage) {
+    hideLoadMore();
+    iziToast.info({
+      title: 'Info',
+      position: 'topRight',
+      message: "We're sorry, but you've reached the end of search results.",
+    });
+  } else {
+    showLoadMore();
+  }
+}
+
+form.addEventListener('submit', onFormSubmit);
+btnLoadMore.addEventListener('click', onLoadMoreClick);
+
+async function onFormSubmit(e) {
+  e.preventDefault();
+
+  searchQuery = input.value.trim();
   gallery.innerHTML = '';
+  currentPage = 1;
 
-  const searchQuery = input.value.trim();
-  if (searchQuery === '') {
-    loader.style.display = 'none';
+  if (!searchQuery) {
+    hideLoadMore();
     iziToast.error({
       title: 'Error',
       message: 'Please enter a search query',
@@ -24,17 +61,34 @@ form.addEventListener('submit', event => {
     return;
   }
 
-  fetchImages(searchQuery)
-    .then(images => {
-      loader.style.display = 'none';
-      renderImages(images);
-      input.value = '';
-    })
-    .catch(error => {
-      console.error(error);
-      iziToast.error({
-        title: 'Error',
-        message: 'Failed to fetch images. Please try again later.',
-      });
-    });
-});
+  try {
+    showLoader();
+    const data = await fetchImages(searchQuery, currentPage);
+    maxPage = Math.ceil(data.totalHits / per_page);
+    renderImages(data.hits);
+  } catch (err) {
+    console.log(err);
+  }
+
+  hideLoader();
+  checkBtnStatus();
+  e.target.reset();
+}
+
+async function onLoadMoreClick() {
+  currentPage += 1;
+  showLoader();
+  try {
+    const data = await fetchImages(searchQuery, currentPage);
+    renderImages(data.hits);
+  } catch (err) {
+    console.log(err);
+  }
+
+  scrollBy({
+    top: 950,
+    behavior: 'smooth',
+  });
+  checkBtnStatus();
+  hideLoader();
+}

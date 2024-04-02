@@ -21,14 +21,25 @@
             type="text"
             id="search-input"
             placeholder="Search images"
+            name="input-form"
           />
           <button class="button" type="submit">Search</button>
         </form>
       </div>
 
-      <div id="loader" class="loader"></div>
+      <div id="loader" class="loader hidden"></div>
 
-      <ul class="gallery"></ul>
+      <ul class="gallery js-article-list"></ul>
+
+      <div class="div-load-more-btn">
+        <button
+          type="button"
+          class="load-more-btn hidden button"
+          id="load-more-btn"
+        >
+          Load more
+        </button>
+      </div>
     </div>
     <script type="module" src="./main.js"></script>
   </body>

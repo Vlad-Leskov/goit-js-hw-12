@@ -1,27 +1,9 @@
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
-function clearGallery() {
-  const gallery = document.querySelector('.gallery');
-  gallery.innerHTML = '';
-}
 
 function renderImages(images) {
   const gallery = document.querySelector('.gallery');
-  clearGallery();
-
-  if (images.length === 0) {
-    iziToast.error({
-      title: 'Error',
-      position: 'topRight',
-      message:
-        'Sorry, there are no images matching your search query. Please try again!',
-    });
-
-    return;
-  }
-
   const galleryMarkup = images
     .map(image => {
       return `<li class="gallery-item">

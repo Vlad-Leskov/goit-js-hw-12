@@ -1,20 +1,28 @@
-const apiKey = '43042751-379763e2b45d181b55d7040e4';
-const baseUrl = 'https://pixabay.com/api/';
+import axios from 'axios';
 
-function fetchImages(searchQuery) {
-  const url = `${baseUrl}?key=${apiKey}&q=${searchQuery}&image_type=photo&orientation=horizontal&safesearch=true`;
+export async function fetchImages(searchQuery, currentPage) {
+  const url = 'https://pixabay.com/api/';
 
-  return fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Unable to fetch images');
-      }
-      return response.json();
-    })
-    .then(data => data.hits)
-    .catch(error => {
-      console.error(error);
-    });
+  const params = {
+    key: '43042751-379763e2b45d181b55d7040e4',
+    q: searchQuery,
+    image_type: 'photo',
+    orientation: 'horizontal',
+    safesearch: true,
+    per_page: 15,
+    page: currentPage,
+  };
+
+  try {
+    const response = await axios.get(url, { params });
+
+    if (response.status !== 200) {
+      throw new Error('Unable to fetch images');
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Unable to fetch images');
+  }
 }
-
-export { fetchImages };
